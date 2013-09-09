@@ -52,7 +52,7 @@ function getContext( target ) {
     target );
 
   // Get canvas context
-  return ( cv && cv.getContext && cv.getContext( "2d" ) );
+  return ( cv.beginPath && cv ) || ( cv && cv.getContext && cv.getContext( "2d" ) );
 }
 
 //
