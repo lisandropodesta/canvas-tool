@@ -1,0 +1,19 @@
+{
+  "author": {
+    "name": "Lisandro Podestá"
+  },
+  "name": "canvas-tool",
+  "repo": "lisandropodesta/canvas-tool",
+  "description": "Canvas tool, primitives serializer",
+  "version": "0.0.1",
+  "keywords": ["HTML5", "canvas"],
+  "dependencies": {
+    "lisandropodesta/type-tool": "*"
+  },
+  "development": {
+  },
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}
