@@ -52,7 +52,7 @@ function getContext( target ) {
     target );
 
   // Get canvas context
-  return ( cv.beginPath && cv ) || ( cv && cv.getContext && cv.getContext( "2d" ) );
+  return ( cv && cv.getContext && cv.getContext( "2d" ) );
 }
 
 //
@@ -88,6 +88,10 @@ CvTool.prototype.getPrimitives = function () {
 function CvPrimitives() {
   this.array = [];
   this.tmpArray = [];
+}
+
+CvPrimitives.prototype.getContext = function () {
+  return this;
 }
 
 CvPrimitives.prototype.beginPath = function () {
