@@ -2,6 +2,7 @@
 // Dependencies
 //
 var
+  autoscale = require( 'autoscale-canvas' ),
   type = require( 'type-tool' );
 
 //
@@ -59,6 +60,11 @@ function getContext( target ) {
   cv = ( isString( target ) ?
     cv = document.getElementById( target ) :
     target );
+
+  // Auto scale
+  if ( cv ) {
+    autoscale( cv );
+  }
 
   // Get canvas context
   return ( cv && cv.getContext && cv.getContext( "2d" ) );
