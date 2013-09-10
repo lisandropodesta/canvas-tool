@@ -1,12 +1,21 @@
 //
 // Dependencies
 //
-var type = require( 'type-tool' );
+var
+  type = require( 'type-tool' );
+
+//
+// External references
+//
+var
+  isString = type.isString;
 
 //
 // Exports
 //
-module.exports = CvTool.prototype;
+module.exports.getAttr = getAttr;
+module.exports.getContext = getContext;
+module.exports.getPrimitives = getPrimitives;
 
 //
 // Canvas attributes dictionary
@@ -47,7 +56,7 @@ function getContext( target ) {
     cv;
 
   // Get canvas element
-  cv = ( type.isString( target ) ?
+  cv = ( isString( target ) ?
     cv = document.getElementById( target ) :
     target );
 
@@ -56,34 +65,14 @@ function getContext( target ) {
 }
 
 //
-// CvTool constructor
+// Get a painting primitives storage object
 //
-function CvTool() {
-}
-
-//
-// Gets an attribute name from a keyword
-//
-CvTool.prototype.getAttr = function ( n ) {
-  return getAttr( n );
-}
-
-//
-// Gets canvas context from one canvas element or its ID
-//
-CvTool.prototype.getContext = function ( e ) {
-  return getContext( e );
-}
-
-//
-// Gets canvas context from one canvas element or its ID
-//
-CvTool.prototype.getPrimitives = function () {
+function getPrimitives() {
   return new CvPrimitives();
 }
 
 //
-// CvPrimitives constructor
+// Primitives class constructor
 //
 function CvPrimitives() {
   this.array = [];
@@ -114,6 +103,9 @@ CvPrimitives.prototype.fill = function () {
   this.tmpArray.push( { fn: "fill" } );
 }
 
+//
+// Stores all primitives and resets temporary storage array
+//
 CvPrimitives.prototype.stroke = function () {
   for ( var n in this ) {
     if ( getAttr( n ) ) {
@@ -132,6 +124,26 @@ CvPrimitives.prototype.stroke = function () {
 }
 
 //
+// Enum primitives
+//
+CvPrimitives.prototype.enum = function ( callback ) {
+  var
+    r,
+    result = [];
+
+  for ( var i = 0; i < this.array.length; i++ ) {
+    if ( isFunction( callback ) ) {
+      r = callback( this.array[ i ], i );
+      if ( null !== r ) {
+        result.push( r );
+      }
+    }
+  }
+
+  return result;
+}
+
+//
 // Paints primitives to target
 //
 CvPrimitives.prototype.paint = function ( target ) {
@@ -140,14 +152,13 @@ CvPrimitives.prototype.paint = function ( target ) {
 
   ctx = getContext( target );
   if ( ctx ) {
-    for ( var i = 0; i < this.array.length; i++ ) {
-      p = this.array[ i ];
+    this.enum( function ( p ) { 
       if ( p.fn ) {
         ctx[ p.fn ].apply( ctx, p.params );
       }
       else {
         ctx[ p.attr ] = p.value;
       }
-    }
+    } );
   }
 }
