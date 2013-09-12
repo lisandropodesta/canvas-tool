@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Canvas Polygon Test</title>
+		<script src="../build/build.js"></script>
+		<style>
+			canvas{
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas1" height="400" width="400"></canvas>
+		<canvas id="canvas2" height="400" width="400"></canvas>
+
+		<script>
+
+			function paintSomething( ctx ) {
+
+				ctx.rect( 10, 10, 200, 100 );
+				ctx.strokeStyle = 'orange';
+				ctx.fillStyle = 'yellow';
+				ctx.fill();
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.strokeStyle = 'blue';
+				ctx.fillStyle = 'cyan';
+				ctx.lineWidth = 4;
+				ctx.moveTo( 10, 120 );
+				ctx.lineTo( 210, 120 );
+				ctx.lineTo( 210, 200 );
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.arc( 80, 220, 50, 0, 2 * Math.PI, false );
+				ctx.fillStyle = 'green';
+				ctx.fill();
+				ctx.stroke();
+			}
+
+			// Paints directly to canvas context
+			var canvas = require( 'canvas-tool' );
+			paintSomething( canvas.getContext( 'canvas1' ) );
+
+			// Stores drawing primitives,
+			var ctx = canvas.getPrimitives();
+			paintSomething( ctx );
+
+			// and then paint them to canvas
+			ctx.paint( 'canvas2' );
+
+		</script>
+	</body>
+</html>

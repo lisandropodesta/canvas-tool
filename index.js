@@ -1,63 +1,74 @@
-//
-// Dependencies
-//
-var
-  autoscale = require( 'autoscale-canvas' ),
-  type = require( 'type-tool' );
+/**
+ * Dependencies
+ */
 
-//
-// External references
-//
-var
-  isString = type.isString;
+var autoscale = require( 'autoscale-canvas' );
+var type = require( 'type-tool' );
 
-//
-// Exports
-//
+/**
+ * External references
+ */
+
+var isString = type.isString;
+var isFunction = type.isFunction;
+
+/**
+ * Exports
+ */
+
 module.exports.getAttr = getAttr;
 module.exports.getContext = getContext;
 module.exports.getPrimitives = getPrimitives;
 
-//
-// Canvas attributes dictionary
-//
+/**
+ * Canvas attributes dictionary
+ */
+
 var CANVAS_ATTR = {
   // Colors, Styles and Shadows
-  fillStyle: "fillStyle",
-  strokeStyle: "strokeStyle",
-  shadowColor: "shadowColor",
-  shadowBlur: "shadowBlur",
-  shadowOffsetX: "shadowOffsetX",
-  shadowOffsetY: "shadowOffsetY",
+  fillStyle: 'fillStyle',
+  strokeStyle: 'strokeStyle',
+  shadowColor: 'shadowColor',
+  shadowBlur: 'shadowBlur',
+  shadowOffsetX: 'shadowOffsetX',
+  shadowOffsetY: 'shadowOffsetY',
 
   // Line styles
-  lineCap: "lineCap",
-  lineJoin: "lineJoin",
-  lineWidth: "lineWidth",
-  miterLimit: "miterLimit",
+  lineCap: 'lineCap',
+  lineJoin: 'lineJoin',
+  lineWidth: 'lineWidth',
+  miterLimit: 'miterLimit',
 
   // Text
-  font: "font",
-  textAlign: "textAlign",
-  textBaseline: "textBaseline"
+  font: 'font',
+  textAlign: 'textAlign',
+  textBaseline: 'textBaseline'
 };
 
-//
-// Gets an attribute name from a keyword
-//
-function getAttr( n ) {
-  return CANVAS_ATTR[ n ];
+/**
+ * Gets an attribute name from a keyword
+ *
+ * @param {string} k Keyword
+ * @return {string} Attribute name
+ * @api public
+ */
+
+function getAttr( k ) {
+  return CANVAS_ATTR[ k ];
 }
 
-//
-// Gets canvas context from one canvas element or its ID
-//
+/**
+ * Gets canvas context from one canvas element or its ID
+ *
+ * @param {element|string} target Target canvas element or target canvas element ID
+ * @return {context} Canvas context
+ * @api public
+ */
+
 function getContext( target ) {
-  var
-    cv;
 
   // Get canvas element
-  cv = ( isString( target ) ?
+  var cv = ( isString( target ) ?
     cv = document.getElementById( target ) :
     target );
 
@@ -66,53 +77,115 @@ function getContext( target ) {
     autoscale( cv );
   }
 
+  // CanvasPrimitives emulates context
+  if ( cv instanceof CanvasPrimitives ) {
+    return cv;
+  }
+
   // Get canvas context
-  return ( cv && cv.getContext && cv.getContext( "2d" ) );
+  return ( cv && cv.getContext && cv.getContext( '2d' ) );
 }
 
-//
-// Get a painting primitives storage object
-//
+/**
+ * Get a painting primitives storage object
+ *
+ * @return {CanvasPrimitives} Canvas primitives container
+ * @api public
+ */
+
 function getPrimitives() {
-  return new CvPrimitives();
+  return new CanvasPrimitives();
 }
 
-//
-// Primitives class constructor
-//
-function CvPrimitives() {
+/**
+ * Primitives class function
+ *
+ * @return {CanvasPrimitives} Canvas primitives container
+ * @api public
+ */
+
+function CanvasPrimitives() {
   this.array = [];
   this.tmpArray = [];
 }
 
-CvPrimitives.prototype.getContext = function () {
-  return this;
+/**
+ * Canvas.beginPath emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.beginPath = function () {
+  this.tmpArray.push( { fn: 'beginPath' } );
 }
 
-CvPrimitives.prototype.beginPath = function () {
-  this.tmpArray.push( { fn: "beginPath" } );
+/**
+ * Canvas.closePath emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.closePath = function () {
+  this.tmpArray.push( { fn: 'closePath' } );
 }
 
-CvPrimitives.prototype.closePath = function () {
-  this.tmpArray.push( { fn: "closePath" } );
+/**
+ * Canvas.moveTo emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.moveTo = function ( x, y ) {
+  this.tmpArray.push( { fn: 'moveTo', params: [ x, y ] } );
 }
 
-CvPrimitives.prototype.moveTo = function ( x, y ) {
-  this.tmpArray.push( { fn: "moveTo", params: [ x, y ] } );
+/**
+ * Canvas.lineTo emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.lineTo = function ( x, y ) {
+  this.tmpArray.push( { fn: 'lineTo', params: [ x, y ] } );
 }
 
-CvPrimitives.prototype.lineTo = function ( x, y ) {
-  this.tmpArray.push( { fn: "lineTo", params: [ x, y ] } );
+/**
+ * Canvas.fill emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.fill = function () {
+  this.tmpArray.push( { fn: 'fill' } );
 }
 
-CvPrimitives.prototype.fill = function () {
-  this.tmpArray.push( { fn: "fill" } );
+/**
+ * Canvas.rect emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.rect = function ( x, y, width, height ) {
+  this.tmpArray.push( { fn: 'rect', params: [ x, y, width, height ] } );
 }
 
-//
-// Stores all primitives and resets temporary storage array
-//
-CvPrimitives.prototype.stroke = function () {
+/**
+ * Canvas.arc emulator
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.arc = function ( x, y, radius, startAngle, endAngle, side ) {
+  this.tmpArray.push( { fn: 'arc', params: [ x, y, radius, startAngle, endAngle, side ] } );
+}
+
+/**
+ * Canvas.stroke emulator, stores all primitives and resets temporary storage array
+ *
+ * @api public
+ */
+
+CanvasPrimitives.prototype.stroke = function () {
   for ( var n in this ) {
     if ( getAttr( n ) ) {
       this.array.push( { attr: n, value: this[ n ] } );
@@ -124,22 +197,26 @@ CvPrimitives.prototype.stroke = function () {
     this.array.push( this.tmpArray[ i ] );
   }
 
-  this.array.push( { fn: "stroke" } );
+  this.array.push( { fn: 'stroke' } );
 
   this.tmpArray = [];
 }
 
-//
-// Enum primitives
-//
-CvPrimitives.prototype.enum = function ( callback ) {
-  var
-    r,
-    result = [];
+/**
+ * Enumerate stored primitives
+ *
+ * @param {function} callback Callback function
+ * @return {array} Array with all callback's return values
+ * @api public
+ */
+
+CanvasPrimitives.prototype.enum = function ( callback ) {
+
+  var result = [];
 
   for ( var i = 0; i < this.array.length; i++ ) {
     if ( isFunction( callback ) ) {
-      r = callback( this.array[ i ], i );
+      var r = callback( this.array[ i ], i );
       if ( null !== r ) {
         result.push( r );
       }
@@ -149,14 +226,16 @@ CvPrimitives.prototype.enum = function ( callback ) {
   return result;
 }
 
-//
-// Paints primitives to target
-//
-CvPrimitives.prototype.paint = function ( target ) {
-  var
-    p, ctx;
+/**
+ * Paints stored primitives to target
+ *
+ * @param {element|string} target Target canvas element or target canvas element ID
+ * @api public
+ */
 
-  ctx = getContext( target );
+CanvasPrimitives.prototype.paint = function ( target ) {
+
+  var ctx = getContext( target );
   if ( ctx ) {
     this.enum( function ( p ) { 
       if ( p.fn ) {
