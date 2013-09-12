@@ -72,14 +72,14 @@ function getContext( target ) {
     cv = document.getElementById( target ) :
     target );
 
-  // Auto scale
-  if ( cv ) {
-    autoscale( cv );
-  }
-
   // CanvasPrimitives emulates context
   if ( cv instanceof CanvasPrimitives ) {
     return cv;
+  }
+
+  // Auto scale
+  if ( cv ) {
+    autoscale( cv );
   }
 
   // Get canvas context
