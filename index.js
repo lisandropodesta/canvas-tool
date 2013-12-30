@@ -2,8 +2,8 @@
  * Dependencies
  */
 
-var autoscale = require( 'autoscale-canvas' );
-var type = require( 'type-tool' );
+var autoscale = require( 'component-autoscale-canvas' );
+var type = require( 'lisandropodesta-type-tool' );
 
 /**
  * External references
