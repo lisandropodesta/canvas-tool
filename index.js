@@ -17,6 +17,7 @@ var isFunction = type.isFunction;
  */
 
 module.exports.getAttr = getAttr;
+module.exports.getCanvas = getCanvas;
 module.exports.getContext = getContext;
 module.exports.getPrimitives = getPrimitives;
 
@@ -58,6 +59,33 @@ function getAttr( k ) {
 }
 
 /**
+ * Gets canvas from one canvas element or its ID
+ *
+ * @param {element|string} target Target canvas element or target canvas element ID
+ * @return {canvas} Canvas
+ * @api public
+ */
+
+function getCanvas( target ) {
+
+  if ( target instanceof CanvasPrimitives ) {
+    return target;
+  }
+
+  // Get canvas element
+  var cv = ( isString( target ) ?
+    document.getElementById( target ) :
+    target );
+
+  // Auto scale
+  if ( cv ) {
+    autoscale( cv );
+  }
+
+  return cv;
+}
+
+/**
  * Gets canvas context from one canvas element or its ID
  *
  * @param {element|string} target Target canvas element or target canvas element ID
@@ -67,20 +95,13 @@ function getAttr( k ) {
 
 function getContext( target ) {
 
-  // Get canvas element
-  var cv = ( isString( target ) ?
-    cv = document.getElementById( target ) :
-    target );
-
   // CanvasPrimitives emulates context
-  if ( cv instanceof CanvasPrimitives ) {
-    return cv;
+  if ( target instanceof CanvasPrimitives ) {
+    return target;
   }
 
-  // Auto scale
-  if ( cv ) {
-    autoscale( cv );
-  }
+  // Get canvas element
+  var cv = getCanvas( target );
 
   // Get canvas context
   return ( cv && cv.getContext && cv.getContext( '2d' ) );
@@ -93,8 +114,8 @@ function getContext( target ) {
  * @api public
  */
 
-function getPrimitives() {
-  return new CanvasPrimitives();
+function getPrimitives( width, height ) {
+  return new CanvasPrimitives( width, height );
 }
 
 /**
@@ -104,7 +125,9 @@ function getPrimitives() {
  * @api public
  */
 
-function CanvasPrimitives() {
+function CanvasPrimitives( width, height ) {
+  this.width = width;
+  this.height = height;
   this.array = [];
   this.tmpArray = [];
 }
